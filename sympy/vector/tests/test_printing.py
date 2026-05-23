@@ -6,7 +6,6 @@ from sympy.printing.latex import latex
 from sympy.printing.pretty import pretty as xpretty
 from sympy.vector import CoordSys3D, Del, Vector, express
 from sympy.abc import a, b, c
-from sympy.testing.pytest import XFAIL
 
 
 def pretty(expr):
@@ -42,13 +41,13 @@ upretty_v_8 = """\
 j_N + ⎜x_C  - ⎮ f(b) db⎟ k_N\n\
       ⎝       ⌡        ⎠    \
 """
-pretty_v_8 = """\
-j_N + /         /       \\\n\
-      |   2    |        |\n\
-      |x_C  -  | f(b) db|\n\
-      |        |        |\n\
-      \\       /         / \
-"""
+pretty_v_8 = (
+    "      /         /       \\    \n"
+    "      |   2    |        |    \n"
+    "j_N + |x_C  -  | f(b) db| k_N\n"
+    "      |        |        |    \n"
+    "      \\       /         /    "
+)
 
 v.append(N.i + C.k)  # type: ignore
 v.append(express(N.i, C))  # type: ignore
@@ -58,13 +57,13 @@ upretty_v_11 = """\
 ⎝a  + b⎠ i_N  + ⎜⎮ f(b) db⎟ k_N\n\
                 ⎝⌡        ⎠    \
 """
-pretty_v_11 = """\
-/ 2    \\ + /  /       \\\n\
-\\a  + b/ i_N| |        |\n\
-           | | f(b) db|\n\
-           | |        |\n\
-           \\/         / \
-"""
+pretty_v_11 = (
+    "               /  /       \\    \n"
+    "/ 2    \\       | |        |    \n"
+    "\\a  + b/ i_N + | | f(b) db| k_N\n"
+    "               | |        |    \n"
+    "               \\/         /    "
+)
 
 for x in v:
     d.append(x | N.k)  # type: ignore
@@ -83,10 +82,10 @@ upretty_d_7 = """\
 ⎛ 2    ⎞                                     \n\
 ⎝a  + b⎠ (i_N|k_N)  + (3⋅y_C - 3⋅c) (k_N|k_N)\
 """
-pretty_d_7 = """\
-/ 2    \\ (i_N|k_N) + (3*y_C - 3*c) (k_N|k_N)\n\
-\\a  + b/                                    \
-"""
+pretty_d_7 = (
+    "/ 2    \\                                    \n"
+    "\\a  + b/ (i_N|k_N) + (3*y_C - 3*c) (k_N|k_N)"
+)
 
 
 def test_str_printing():
@@ -105,7 +104,6 @@ def test_str_printing():
                          'Integral(f(b), b))*(N.k|N.k)')
 
 
-@XFAIL
 def test_pretty_printing_ascii():
     assert pretty(v[0]) == '0'
     assert pretty(v[1]) == 'i_N'

@@ -1156,7 +1156,7 @@ class PrettyPrinter(Printer):
         from sympy.vector import Vector
 
         if not self._use_unicode:
-            raise NotImplementedError("ASCII pretty printing of BasisDependent is not implemented")
+            return self._print_BasisDependent_ascii(expr)
 
         if expr == expr.zero:
             return prettyForm(expr.zero._pretty_form)
@@ -1253,6 +1253,36 @@ class PrettyPrinter(Printer):
                     strs[j] += ' '*(lengths[-1]+3)
 
         return prettyForm('\n'.join([s[:-3] for s in strs]))
+
+    def _print_BasisDependent_ascii(self, expr):
+        from sympy.vector import Vector
+
+        if expr == expr.zero:
+            return prettyForm(expr.zero._pretty_form)
+
+        parts = []
+        if isinstance(expr, Vector):
+            items = expr.separate().items()
+        else:
+            items = [(0, expr)]
+
+        for system, vect in items:
+            inneritems = list(vect.components.items())
+            inneritems.sort(key=lambda x: x[0].__str__())
+            for k, v in inneritems:
+                basis = prettyForm(k._pretty_form)
+                if v == 1:
+                    parts.append(basis)
+                elif v == -1:
+                    parts.append(prettyForm("(-1) " + k._pretty_form))
+                else:
+                    arg = prettyForm(*self._print(v).parens())
+                    parts.append(prettyForm(*arg.right(" ", basis)))
+
+        pform = parts[0]
+        for part in parts[1:]:
+            pform = prettyForm(*stringPict.next(pform, " + ", part))
+        return pform
 
     def _print_NDimArray(self, expr):
         from sympy.matrices.immutable import ImmutableMatrix
